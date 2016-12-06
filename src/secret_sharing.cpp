@@ -36,26 +36,24 @@ void recover(opts_t &opts, string &secret) {
     int status;
     status = importShares(opts, rp, destruction_key_encoded, authorizer_key_encoded, shareStrings, !(bool(opts.forceRecover)));
 
-    if (opts.verbose == true) {
-        if (status == 0) {
-            cout << "secret_owner:\t\t" << rp.secretOwner << endl;
-            cout << "nShares:\t\t" << rp.nShares << endl;
-            cout << "threshold:\t\t" << rp.threshold << endl;
-            cout << "authorizer_exists:\t" << rp.authorizer_exists << endl;
-            cout << "destruction_key_exists:\t" << rp.destruction_key_exists << endl;
-        }
-        for (int i = 0; i < opts.nShares; ++i) {
-            cout << "Share " << i << ":\t\t" << shareStrings[i] << endl;
-        }
-        cout << "destruction key:\t" << destruction_key_encoded << endl;
-        cout << "authorizer key:\t\t" << authorizer_key_encoded << endl;
-    }
-
     if (status != 0) { 
         string msg;
         statusCodeMessage(status, msg);
         cerr << "[x] Something went wrong -- Status Code: " << status << " Status Message: " << msg << endl; 
         exit(-1); 
+    }
+
+    if (opts.verbose == true) {
+        cout << "secret_owner:\t\t" << rp.secretOwner << endl;
+        cout << "nShares:\t\t" << rp.nShares << endl;
+        cout << "threshold:\t\t" << rp.threshold << endl;
+        cout << "authorizer_exists:\t" << rp.authorizer_exists << endl;
+        cout << "destruction_key_exists:\t" << rp.destruction_key_exists << endl;
+        for (int i = 0; i < rp.nShares; ++i) {
+            cout << "Share " << i << ":\t\t" << shareStrings[i] << endl;
+        }
+        cout << "authorizer key:\t\t" << authorizer_key_encoded << endl;
+        cout << "destruction key:\t" << destruction_key_encoded << endl;
     }
 
     string shared_secret;
@@ -106,8 +104,7 @@ int importShares(opts_t &opts, recover_properties &rp, string &destruction_key, 
             if (type_occur[1] != 1) return -9;
         } else if (type_occur[1] != 0) return -10;
         
-        // must check that common ids and shares are not used
-        // TODO
+        // check that duplicate ids and shares are not used
         for (int i = 0; i < opts.numInputFiles; ++i) {
             for (int j = i+1; j < opts.numInputFiles; ++j) {
                 if (sd[i].share_id == sd[j].share_id && sd[i].type == SHARE && sd[j].type == SHARE) {
