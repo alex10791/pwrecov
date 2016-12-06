@@ -35,13 +35,27 @@ pwrecov -g -a -d -s 3 -t 2
 -s 3 : create 3 shares
 -t 2 : require 2 for decription
 
-Decryption Example
-pwrecov -r -a -d -s 3 -t 2 -v shares/share.simp.000 shares/share.simp.001 shares/share.simp.002 shares/share.auth.key shares/share.dest.key
+Decryption Examples
+pwrecov -r shares/share.simp.000 shares/share.simp.001 shares/share.simp.002 shares/share.auth.key shares/share.dest.ke
+-r   : recover
+     : append all filenames to be used
+
+pwrecov -r -a -d -s 3 -t 2 -v -f shares/share.simp.000 shares/share.simp.001 shares/share.simp.002 shares/share.auth.key shares/share.dest.key
 -r   : recover
 -a   : use authorizer
 -d   : use destructor key
 -s 3 : use 3 shares
 -t 2 : use 2 for decription
 -v   : verbose output
--f   : force the usage of the give parameters (if not used, file parameters used instead)
+-f   : force the usage of the give parameters
      : append all filenames to be used
+
+
+Build
+-----
+Requries: crypto++
+make
+
+Run
+---
+make run ARGS="-h"

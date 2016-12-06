@@ -8,7 +8,7 @@ typedef struct opts_t {
 	int nShares;					// -s number of shares
 	int threshold;					// -t threshold count
 	//char* password;				// -p password string
-	char* inFile;					// -p password file
+	//char* inFile;					// -p password file
 	bool destructionKey;			// -d generate destruction key
 	bool authorizer;				// -a generate authorizer key
 	char** inShares;				// -? input shares

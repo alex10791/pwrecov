@@ -30,7 +30,7 @@ void recover(opts_t &opts, string &secret) {
     string destruction_key_encoded;
     string authorizer_key_encoded;
 
-    string *shareStrings = new string[opts.nShares];
+    string *shareStrings = new string[opts.numInputFiles];
     recover_properties rp;
 
     int status;
@@ -61,10 +61,10 @@ void recover(opts_t &opts, string &secret) {
     string shared_secret;
     string authorizer_clear;
 
-    SecretRecoverString(opts.threshold, shared_secret, shareStrings);
+    SecretRecoverString(rp.threshold, shared_secret, shareStrings);
 
-    decrypt(shared_secret, authorizer_clear, authorizer_key_encoded, opts.authorizer);
-    decrypt(authorizer_clear, secret, destruction_key_encoded, opts.destructionKey);
+    decrypt(shared_secret, authorizer_clear, authorizer_key_encoded, rp.authorizer_exists);
+    decrypt(authorizer_clear, secret, destruction_key_encoded, rp.destruction_key_exists);
 
 }
 
@@ -136,7 +136,7 @@ int importShares(opts_t &opts, recover_properties &rp, string &destruction_key, 
 
     int share_count = 0;
     for (int i = 0; i < opts.numInputFiles; ++i) {
-        if (share_count > opts.nShares) return -13;
+        if (share_count > rp.nShares) return -13;
         if (sd[i].type == SHARE) { shareStrings[share_count] = sd[i].share; share_count++; }
         if (sd[i].type == AUTHORIZER_KEY) authorizer_key = sd[i].share;
         if (sd[i].type == DESTRUCTION_KEY) destruction_key = sd[i].share;
