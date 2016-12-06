@@ -9,6 +9,7 @@ CC = g++
 #  -Wall turns on most, but not all, compiler warnings
 CFLAGS  = -g -Wall
 CLIBDIR = -L /usr/local/Cellar/cryptopp/5.6.3_1/lib/ 
+#CLIBDIR = -
 CHEADER_DIR = -I /usr/local/Cellar/cryptopp/5.6.3_1/include/cryptopp/ -I src/include/
 CLIBS   = -lcryptopp
 

@@ -1,0 +1,10 @@
+# SECRET SHARE ISSUED #
+-----------------------
+id:			000
+type:			0
+secret owner:		user
+shares:			3
+threshold:		2
+authorizer:		1
+destruction key:	1
+share:			...

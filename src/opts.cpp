@@ -1,10 +1,29 @@
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <iostream>
 #include "opts.h"
+
+using namespace std;
+
+
+static const char *optString = "gru:s:t:p:dafvh?";        //Il:o:vh?
 
 void display_usage( int exit_code )
 {
     //puts( "doc2html - convert documents to HTML" );
-    cout << "kokos" << endl;
+    cout << "-g\t:\tgenerate shares from secret" << endl;
+    cout << "-r\t:\trecover secret from shares" << endl;
+    cout << "-u\t:\tsecret owner identifier" << endl;
+    cout << "-s\t:\tnumber of shares" << endl;
+    cout << "-t\t:\tshares threshold" << endl;
+//    cout << "-p\t:\tsecret" << endl;
+    cout << "-d\t:\tgenerate destruction key" << endl;
+    cout << "-a\t:\tgenerate authorizer key" << endl;
+    cout << "-f\t:\tforce recover using options instead of file data (skips file validation)" << endl;
+    cout << "-v\t:\tverbose output" << endl;
+    cout << "-h\t:\tdisplay this message" << endl;
     /* ... */
     exit( exit_code );
 }
@@ -17,14 +36,17 @@ bool parse_inputs(int argc, char* argv[], opts_t &opts) {
 
     opts.generate = false;
 	opts.recover = false;
-	opts.userIdentifier = "user";
+	opts.secretOwner = "user";
 	opts.nShares = 0;
 	opts.threshold = 0;
 	//opts.password;
-	opts.inFile = NULL;
+//	opts.inFile = NULL;
 	opts.destructionKey = false;
-	opts.authenticator = false;
-	//opts.inShares[] = NULL;
+	opts.authorizer = false;
+	opts.inShares = argv;
+    opts.numInputFiles = 0;
+    opts.forceRecover = false;
+    opts.verbose = false;
 
     opt = getopt( argc, argv, optString );
     while( opt != -1 ) {
@@ -38,7 +60,7 @@ bool parse_inputs(int argc, char* argv[], opts_t &opts) {
                 break;
                     
             case 'u':
-                opts.userIdentifier = optarg;
+                opts.secretOwner = optarg;
                 break;
                 
             case 's':
@@ -49,18 +71,26 @@ bool parse_inputs(int argc, char* argv[], opts_t &opts) {
                 opts.threshold = atoi(optarg);
                 break;
 
-         	case 'p':
-                opts.inFile = optarg;
-                break;
+//         	case 'p':
+//                opts.inFile = optarg;
+//                break;
 
             case 'd':
                 opts.destructionKey = true;
                 break;
 
-           	case 'a':
-                opts.authenticator = true;
+            case 'a':
+                opts.authorizer = true;
                 break;
-                
+
+            case 'f':
+                opts.forceRecover = true;
+                break;
+
+            case 'v':
+                opts.verbose = true;
+                break;
+          
             case 'h':   /* fall-through is intentional */
             case '?':
                 display_usage(EXIT_SUCCESS);
@@ -74,8 +104,8 @@ bool parse_inputs(int argc, char* argv[], opts_t &opts) {
         opt = getopt( argc, argv, optString );
     }
     
-    //opts.inputFiles = argv + optind;
-    //opts.numInputFiles = argc - optind;
+    opts.inShares = argv + optind;
+    opts.numInputFiles = argc - optind;
     
     return true;
 }
@@ -83,6 +113,10 @@ bool parse_inputs(int argc, char* argv[], opts_t &opts) {
 
 bool check_options(opts_t &opts) {
 	bool no_error = true;
+    int min_number_of_files = opts.threshold;
+    if (opts.authorizer == true) min_number_of_files++;
+    if (opts.destructionKey == true) min_number_of_files++;
+
 	if (opts.generate == opts.recover) {
 		cout << "[x] Please only generate or recover" << endl;
 		no_error = false;
@@ -91,10 +125,10 @@ bool check_options(opts_t &opts) {
 		cout << "[x] Shareholders should be more than threshold" << endl;
 		no_error = false;
 	}
-	if (opts.userIdentifier == NULL) {
-		cout << "[!] Warrning: no user identifier found, using default string \"user\"" << endl;
+	if (opts.secretOwner == NULL) {
+		cout << "[!] Warrning: no secret owner identifier found, using default string \"user\"" << endl;
 	}
-	if (opts.nShares <= 1) {
+	if (opts.nShares < 1 || opts.nShares > 1000) {
 		cout << "[x] Sharholders should be positive" << endl;
 		no_error = false;
 	}
@@ -104,8 +138,12 @@ bool check_options(opts_t &opts) {
 	}
 	if (opts.inFile == NULL) {
 		cout << "[x] Input file not given" << endl;
-		no_error = false;
+        no_error = false;
 	}
+    if (opts.recover == true && opts.numInputFiles < min_number_of_files) {
+        cout << "[x] Input shares must be at least as as many as threshold" << endl;
+        no_error = false;
+    }
 	if (!no_error) {
 		cout << "[*] For help use -h" << endl;
 		exit(EXIT_SUCCESS);
