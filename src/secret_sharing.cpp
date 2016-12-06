@@ -77,7 +77,7 @@ int importShares(opts_t &opts, recover_properties &rp, string &destruction_key, 
     }
 
     int type_occur[3];
-    for (int i = 0; i < 3; ++i) type_occur[0] = 0;
+    for (int i = 0; i < 3; ++i) type_occur[i] = 0;
 
     // if validation is required
     if (validate == true) {
