@@ -1,2 +1,4 @@
 bin/*
-backup/*
+shares/*
+!bin/.keep
+!shares/.keep

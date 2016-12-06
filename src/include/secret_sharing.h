@@ -1,11 +1,11 @@
 #ifndef __SECRET_SHARING__
 #define __SECRET_SHARING__
 
-#include "crypto++/ida.h"
-#include "crypto++/osrng.h"
-#include "crypto++/files.h"
-#include "crypto++/default.h"
-#include "crypto++/hex.h"
+#include "cryptopp/ida.h"
+#include "cryptopp/osrng.h"
+#include "cryptopp/files.h"
+#include "cryptopp/default.h"
+#include "cryptopp/hex.h"
 
 #include "opts.h"
 
